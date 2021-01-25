@@ -23,15 +23,20 @@ namespace Korelskiy.RFCitiesStatistic
                 connection.Open();
 
                 SqlCommand command = new SqlCommand("INSERT INTO Cities " +
-                    "(Name, FirstYear, SecondYear, FirstYearPopulation, SecondYearPopulation) VALUES " +
-                    "(@Name, @FirstYear, @SecondYear, @FirstYearPopulation, @SecondYearPopulation)", connection);
+                    "(Name, FirstYear, SecondYear, FirstYearPopulation, SecondYearPopulation, NumberOfYears, FullChange, OneYearChange) VALUES " +
+                    "(@Name, @FirstYear, @SecondYear, @FirstYearPopulation, @SecondYearPopulation, @NumberOfYears, @FullChange, @OneYearChange)", connection);
                 command.Parameters.AddWithValue("Name", city.Name);
                 command.Parameters.AddWithValue("FirstYear", city.FirstYear);
                 command.Parameters.AddWithValue("SecondYear", city.SecondYear);
                 command.Parameters.AddWithValue("FirstYearPopulation", city.FirstYearPopulation);
                 command.Parameters.AddWithValue("SecondYearPopulation", city.SecondYearPopulation);
+                command.Parameters.AddWithValue("NumberOfYears", city.NumbersOfYears);
+                command.Parameters.AddWithValue("FullChange", Math.Round(city.FullChange,3));
+                command.Parameters.AddWithValue("OneYearChange", Math.Round(city.OneYearChange,3));
 
                 command.ExecuteNonQuery();
+
+                MessageBox.Show("Город добавлен в базу данных");
             }
             catch (Exception ex)
             {
@@ -64,6 +69,9 @@ namespace Korelskiy.RFCitiesStatistic
                     city.SecondYear = Convert.ToInt32(dataReader["SecondYear"]);
                     city.FirstYearPopulation = Convert.ToInt32(dataReader["FirstYearPopulation"]);
                     city.SecondYearPopulation = Convert.ToInt32(dataReader["SecondYearPopulation"]);
+                    city.NumbersOfYears = Convert.ToInt32(dataReader["NumberOfYears"]);
+                    city.FullChange = Convert.ToDouble(dataReader["FullChange"]);
+                    city.OneYearChange = Convert.ToDouble(dataReader["OneYearChange"]);
 
                     cities.Add(city);
                 }

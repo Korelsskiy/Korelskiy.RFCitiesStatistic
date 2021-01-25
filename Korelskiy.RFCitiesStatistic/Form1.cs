@@ -18,7 +18,6 @@ namespace Korelskiy.RFCitiesStatistic
 
             SetDataGrid();
         }
-
         private void SetDataGrid()
         {
             citiesDataGridView.ForeColor = Color.Black;
@@ -83,35 +82,21 @@ namespace Korelskiy.RFCitiesStatistic
 
             if (Validation(firstYear, secondYear, firstYearPopulation, secondYearPopulation))
             {
+                firstYear = int.Parse(firstYearTextBox.Text);
+                secondYear = int.Parse(secondYearTextBox.Text);
+                firstYearPopulation = int.Parse(firstYearPopulationTextBox.Text);
+                secondYearPopulation = int.Parse(secondYearPopulationTextBox.Text);
+
                 SetLabels(firstYear, secondYear, firstYearPopulation, secondYearPopulation);
 
                 if (!addToDbCheckBox.Checked)
                 {
-                    if (AddCityToDb())
-                    {
+                    if (AddCityToDb(firstYear, secondYear, firstYearPopulation, secondYearPopulation))
                         citiesDataGridView.DataSource = new City().GetCitiesFromDb();
-
-                        MessageBox.Show("Город добавлен в базу данных");
-                    }
-                }
-                
-                
-
-                
+                }     
             }
         }
-
-        private void ClearLables()
-        {
-            cityNameTextBox.Text = "";
-            firstYearTextBox.Text = "";
-            secondYearTextBox.Text = "";
-            firstYearPopulationTextBox.Text = "";
-            secondYearPopulationTextBox.Text = "";
-
-        }
-
-        private bool AddCityToDb()
+        private bool AddCityToDb(int firstYear, int secondYear, int firstYearPopulation, int secondYearPopulation)
         {
             City city = new City();
 
@@ -120,6 +105,9 @@ namespace Korelskiy.RFCitiesStatistic
             city.SecondYear = int.Parse(secondYearTextBox.Text);
             city.FirstYearPopulation = int.Parse(firstYearPopulationTextBox.Text);
             city.SecondYearPopulation = int.Parse(secondYearPopulationTextBox.Text);
+            city.NumbersOfYears = AppMath.GetNumberOfYears(firstYear, secondYear);
+            city.FullChange = AppMath.GetFullPopulationChange(firstYearPopulation, secondYearPopulation);
+            city.OneYearChange = AppMath.GetOneYearPopulationChange(firstYear, secondYear, AppMath.GetFullPopulationChange(firstYearPopulation, secondYearPopulation));
 
             new City().AddCityToDb(city);
 
@@ -127,31 +115,12 @@ namespace Korelskiy.RFCitiesStatistic
         }
         private void SetLabels(int firstYear, int secondYear, int firstYearPopulation, int secondYearPopulation)
         {
-            firstYear = int.Parse(firstYearTextBox.Text);
-            secondYear = int.Parse(secondYearTextBox.Text);
-            firstYearPopulation = int.Parse(firstYearPopulationTextBox.Text);
-            secondYearPopulation = int.Parse(secondYearPopulationTextBox.Text);
 
-
-            double popchange = GetPopulationChange(firstYearPopulation, secondYearPopulation);
 
             SetNumOfYearsLabel(firstYear, secondYear);
-            SetAllYearStatisticLabel(firstYearPopulation, secondYearPopulation, popchange);
-            string sign = "";
-            if (firstYearPopulation != secondYearPopulation)
-            {
-                sign = firstYearPopulation > secondYearPopulation ? "-" : "+";
-            }
-            SetOneYearStatisitLabel(firstYear, secondYear, popchange, sign);
-            SetResultLabel(firstYearPopulation, secondYearPopulation, popchange);
-        }
-        private double GetPopulationChange(int firstYearPop, int secondYearPop)
-        {   
-            double popChange = Convert.ToDouble(secondYearPop) / Convert.ToDouble(firstYearPop);
-            popChange = Math.Abs(popChange - 1);
-            popChange *= 100;
-
-            return popChange;
+            SetAllYearStatisticLabel(firstYearPopulation, secondYearPopulation, AppMath.GetFullPopulationChange(firstYearPopulation, secondYearPopulation));
+            SetOneYearStatisitLabel(firstYear, secondYear, firstYearPopulation, secondYearPopulation, AppMath.GetFullPopulationChange(firstYearPopulation, secondYearPopulation));
+            SetResultLabel(firstYearPopulation, secondYearPopulation, AppMath.GetFullPopulationChange(firstYearPopulation, secondYearPopulation));
         }
         private void SetResultLabel(int firstYearPop, int secondYearPop, double popChange)
         {
@@ -182,10 +151,10 @@ namespace Korelskiy.RFCitiesStatistic
 
             resultLabel.Visible = true;
         }
-        private void SetOneYearStatisitLabel(int firstYear, int secondYear, double popChange, string sign)
+        private void SetOneYearStatisitLabel(int firstYear, int secondYear, int firstYearPop, int secondYearPop, double popChange)
         {
             popChange = Math.Round(popChange, 3);
-            oneYearStatisticLabel.Text = $"Изменения за год: {sign}{Math.Round(popChange / (Math.Abs(firstYear - secondYear)), 3)}%";
+            oneYearStatisticLabel.Text = $"Изменения за год: {AppMath.GetSign(firstYearPop, secondYearPop)}{AppMath.GetOneYearPopulationChange(firstYear, secondYear, popChange)}%";
             oneYearStatisticLabel.Visible = true;
         }
         private void SetNumOfYearsLabel(int firstYear, int secondYear)
@@ -195,7 +164,6 @@ namespace Korelskiy.RFCitiesStatistic
         }
         private void SetAllYearStatisticLabel(int firstYearPop, int secondYearPop, double popChange)
         {
-            popChange = Math.Round(popChange, 3);
 
             if (firstYearPop < secondYearPop)
             {
@@ -250,3 +218,15 @@ namespace Korelskiy.RFCitiesStatistic
         }
     }
 }
+
+
+
+
+//private void ClearLables()
+//{
+//    cityNameTextBox.Text = "";
+//    firstYearTextBox.Text = "";
+//    secondYearTextBox.Text = "";
+//    firstYearPopulationTextBox.Text = "";
+//    secondYearPopulationTextBox.Text = "";
+//}

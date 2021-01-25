@@ -15,7 +15,9 @@ namespace Korelskiy.RFCitiesStatistic
         private int firstYearPopulation;
         private int secondYearPopulation;
         private int id;
-
+        private int numbersOfYears;
+        private double fullChange;
+        private double oneYearChange;
         public int Id
         {
             get { return id; }
@@ -25,21 +27,28 @@ namespace Korelskiy.RFCitiesStatistic
         public string Name
         {
             get { return name; }
-            set { name = value; }
+            set 
+            {
+                if (value == "Подзалупинск")
+                {
+                    MessageBox.Show("Запрещенное наименование. Отправка в бд невозможна.");
+                }
+                else
+                {
+                    name = value;
+                }   
+            }
         }
-
         public int FirstYear
         {
             get { return firstYear; }
             set { firstYear = value; }
         }
-
         public int SecondYear
         {
             get { return secondYear; }
             set { secondYear = value; }
         }
-
         public int FirstYearPopulation
         {
             get { return firstYearPopulation; }
@@ -50,14 +59,21 @@ namespace Korelskiy.RFCitiesStatistic
             get { return secondYearPopulation; }
             set { secondYearPopulation = value; }
         }
-
-
-
-
-
-
-
-
+        public int NumbersOfYears
+        {
+            get { return numbersOfYears; }
+            set { numbersOfYears = value; }
+        }
+        public double FullChange
+        {
+            get { return fullChange; }
+            set { fullChange = value; }
+        }
+        public double OneYearChange
+        {
+            get { return oneYearChange; }
+            set { oneYearChange = value; }
+        }
 
         public List<City> GetCitiesFromDb()
         {
@@ -67,7 +83,9 @@ namespace Korelskiy.RFCitiesStatistic
         }
         public void AddCityToDb(City city)
         {
-            new DbManager().AddCity(city);
+
+            if (city.Name != null)
+                new DbManager().AddCity(city);
         }
     }
 }
